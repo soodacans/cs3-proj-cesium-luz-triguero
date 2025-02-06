@@ -1,7 +1,6 @@
 // When the user chooses to exit, this will close the window
 function exitGame() {
-  // Close the window if allowed by the browser
-  // This only works in the code preview. It does not work in the live site due to browser restriction
+  // Closes the window tab
   if (window.confirm("Are you sure you want to leave?")) {
     window.close();
   } else {
@@ -9,10 +8,14 @@ function exitGame() {
   }
 }
 
-// When the user chooses to start the game, this will bring them to the apron webpage
+// When the user chooses to start the game, this will open the apron webpage in a new tab
 function enterGame() {
-  window.location.href = 'apronchoice.html'; 
+  // Open a new tab with the URL of the game
+  let gameWindow = window.open('apronchoice.html', '_blank');
+  
+  window.gameWindow = gameWindow;
 }
+
 
 // Once the user is done choosing, they will be brought to the dessert webpage to choose
 function selectApron(apron) {
@@ -22,6 +25,7 @@ function selectApron(apron) {
 
 // Depending on which the user chose, they will be brought to the corresponding webpage
 function chooseDessert(dessert) {
+  localStorage.setItem('dessertType', dessert)
   if (dessert === 'cake') {
     window.location.href = 'cake.html';  
   } else if (dessert === 'icecream') {
@@ -63,24 +67,34 @@ function selectICFlavor(flavor) {
   window.location.href = 'icecreamtopping.html';
 }
 
-// After the user picks a topping, they will be directed to the finish page where their final decorated sweet treat will be displayed
-function selectICTopping(topping) {
-  localStorage.setItem('topping', topping);  // Store topping choice
-  window.location.href = 'finish.html';
-}
+  // After the user picks a topping, they will be directed to the finish page where their final decorated sweet treat will be displayed
+  function selectICTopping(topping) {
+    localStorage.setItem('topping', topping);  // Store topping choice
+    window.location.href = 'finish.html';
+  }
 
-// When the page is loaded, it retrieves the stored values from localStorage and calls the appropriate function
 window.onload = function() {
   // Retrieve user choices from localStorage
-  let cont = localStorage.getItem("container");
+  let dessertType = localStorage.getItem("dessertType");
+  let shape = localStorage.getItem("shape");
+  let container = localStorage.getItem("container");
   let flavor = localStorage.getItem("flavor");
   let topping = localStorage.getItem("topping");
 
-  // Check if the choices are available HI 
-  if (cont && flavor && topping) {
-    displayFinalIcecream(cont, flavor, topping);
+  // Default placeholder image
+  const defaultImage = "https://via.placeholder.com/300x300.png";
+  const imageElement = document.getElementById("final-image");
+  
+  // Set default image before validation
+  imageElement.src = defaultImage;
+
+  // Determine which dessert to display
+  if (dessertType === "cake" && shape && flavor && topping) {
+    displayFinalCake(shape, flavor, topping);
+  } else if (dessertType === "icecream" && container && flavor && topping) {
+    displayFinalIcecream(container, flavor, topping);
   } else {
-    document.getElementById("final-image").src = "https://via.placeholder.com/300x300.png";  // Default image
+    imageElement.src = defaultImage;
   }
 };
 
@@ -130,7 +144,6 @@ function displayFinalIcecream(cont, flavor, topping) {
 
 // CAKE
 // When the page is loaded, it retrieves the stored values from localStorage and calls the appropriate function
-window.onload = function() {
   // Retrieve user choices from localStorage
   let shape = localStorage.getItem("shape");
   let flavor = localStorage.getItem("flavor");
@@ -142,7 +155,7 @@ window.onload = function() {
   } else {
     document.getElementById("final-image").src = "https://via.placeholder.com/300x300.png";  // Default image
   }
-};
+
 
 // Will use user input from the choices to determine the final CAKE img to be displayed 
 function displayFinalCake(shape, flavor, topping) {
